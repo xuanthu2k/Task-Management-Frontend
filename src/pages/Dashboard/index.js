@@ -10,7 +10,7 @@ import {
 } from "@material-ui/core";
 import tasksApi from "../../api/tasksApi";
 import { useNavigate } from "react-router-dom";
-import NewTask from "../NewTask";
+import NewTask from "../../components/NewTask";
 
 const Dashboard = () => {
     const [tasks, setTasks] = useState([]);
@@ -25,6 +25,11 @@ const Dashboard = () => {
 
     const handleModalClose = () => {
         setModalOpen(false);
+    };
+
+    const handleLogout = () => {
+        localStorage.clear();
+        window.location.reload();
     };
 
     useEffect(() => {
@@ -59,7 +64,11 @@ const Dashboard = () => {
                         setTasks={setTasks}
                     />
                 )}
-                <Button type="button" className="dashboard-button">
+                <Button
+                    type="button"
+                    onClick={handleLogout}
+                    className="dashboard-button"
+                >
                     Logout
                 </Button>
             </div>

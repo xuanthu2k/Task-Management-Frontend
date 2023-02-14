@@ -1,10 +1,11 @@
 import axios from "axios";
+import baseURL from "./baseURL";
 
 const tasksApi = {};
 
 tasksApi.getTasks = async (accessToken) => {
     try {
-        const response = await axios.get("http://localhost:9999/api/tasks", {
+        const response = await axios.get(`${baseURL}/api/tasks`, {
             headers: {
                 Authorization: `Bearer ${accessToken}`,
             },
@@ -23,7 +24,7 @@ tasksApi.createTask = async (data) => {
     try {
         const { accessToken, title, description, dueDate } = data;
         const response = await axios.post(
-            "http://localhost:9999/api/task",
+            `${baseURL}/api/task`,
             {
                 Title: title,
                 Description: description,

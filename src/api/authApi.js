@@ -1,9 +1,10 @@
 import axios from "axios";
+import baseURL from "./baseURL";
 
 const authApi = {};
 authApi.login = async (email, password) => {
     try {
-        const response = await axios.post("http://localhost:9999/api/login", {
+        const response = await axios.post(`${baseURL}/api/login`, {
             email: email,
             password: password,
         });

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import "./styles.css";
 import {
     Grid,
     Card,
@@ -8,23 +7,28 @@ import {
     CircularProgress,
     Button,
 } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core/styles";
 import tasksApi from "../../api/tasksApi";
 import { useNavigate } from "react-router-dom";
 import NewTask from "../../components/NewTask";
+import userApi from "../../api/userApi";
+import pageStyles from "../../styles/pageStyles";
 
 const Dashboard = () => {
+    const classes = pageStyles();
+
     const [tasks, setTasks] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [modalOpen, setModalOpen] = useState(false);
+    const [newTaskModalOpen, setNewTaskModalOpen] = useState(false);
     const accessToken = localStorage.getItem("accessToken");
     const navigate = useNavigate();
 
-    const handleModalOpen = () => {
-        setModalOpen(true);
+    const handleNewTaskModalOpen = () => {
+        setNewTaskModalOpen(true);
     };
 
-    const handleModalClose = () => {
-        setModalOpen(false);
+    const handleNewTaskModalClose = () => {
+        setNewTaskModalOpen(false);
     };
 
     const handleLogout = () => {
@@ -36,30 +40,47 @@ const Dashboard = () => {
         setLoading(true);
         const fetchData = async () => {
             const tasksData = await tasksApi.getTasks(accessToken);
-            if (tasksData === 0) {
+            const userData = await userApi.getInfo(accessToken);
+            if (tasksData === 0 || userData === 0) {
                 navigate("/login");
             } else {
                 setTasks(tasksData.data);
+                console.log(userData);
                 setLoading(false);
             }
         };
         fetchData();
-    }, [modalOpen]);
+    }, [newTaskModalOpen]);
+
+    const handleClickCard = (id) => {
+        navigate(`/task/${id}`);
+    };
+
+    const handleClickUserInfo = () => {
+        navigate("/info");
+    };
 
     return (
-        <>
-            <div className="dashboard-header">
+        <div className={classes.root}>
+            <div className={classes.header}>
                 <Button
                     type="button"
-                    className="dashboard-button"
-                    onClick={handleModalOpen}
+                    className={classes.button}
+                    onClick={handleClickUserInfo}
                 >
-                    New Task
+                    Info
                 </Button>
-                {modalOpen && (
+                <Button
+                    type="button"
+                    className={classes.button}
+                    onClick={handleNewTaskModalOpen}
+                >
+                    New
+                </Button>
+                {newTaskModalOpen && (
                     <NewTask
-                        onClose={handleModalClose}
-                        modalOpen={modalOpen}
+                        onClose={handleNewTaskModalClose}
+                        modalOpen={newTaskModalOpen}
                         tasks={tasks}
                         setTasks={setTasks}
                     />
@@ -67,7 +88,7 @@ const Dashboard = () => {
                 <Button
                     type="button"
                     onClick={handleLogout}
-                    className="dashboard-button"
+                    className={classes.button}
                 >
                     Logout
                 </Button>
@@ -83,21 +104,34 @@ const Dashboard = () => {
                 ) : (
                     tasks.map((task) => (
                         <Grid item key={task._id}>
-                            <Card className="dashboard-card">
+                            <Card
+                                className={classes.card}
+                                onClick={() => handleClickCard(task._id)}
+                            >
                                 <CardContent>
-                                    <Typography variant="h5" component="h2">
+                                    <Typography
+                                        variant="h5"
+                                        component="h2"
+                                        className={classes.title}
+                                    >
                                         {task.Title}
                                     </Typography>
                                     <Typography
-                                        className="dashboard-title"
+                                        className={classes.description}
                                         color="textSecondary"
                                     >
                                         {task.Description}
                                     </Typography>
-                                    <Typography variant="body2">
+                                    <Typography
+                                        variant="body2"
+                                        className={classes.status}
+                                    >
                                         Status: {task.Status}
                                     </Typography>
-                                    <Typography variant="body2">
+                                    <Typography
+                                        variant="body2"
+                                        className={classes.dueDate}
+                                    >
                                         Due Date:{" "}
                                         {new Date(
                                             task.DueDate
@@ -113,7 +147,7 @@ const Dashboard = () => {
                     ))
                 )}
             </Grid>
-        </>
+        </div>
     );
 };
 

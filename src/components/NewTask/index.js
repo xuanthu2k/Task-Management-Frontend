@@ -7,46 +7,12 @@ import Button from "@material-ui/core/Button";
 import tasksApi from "../../api/tasksApi";
 import MessageDialog from "../MessageDialog";
 import { CircularProgress } from "@material-ui/core";
-
-const useStyles = makeStyles((theme) => ({
-    modal: {
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-    },
-    paper: {
-        backgroundColor: theme.palette.background.paper,
-        boxShadow: theme.shadows[5],
-        padding: theme.spacing(2, 4, 3),
-        width: "50%",
-        height: "auto",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-    },
-    title: {
-        margin: "1rem 0",
-    },
-    form: {
-        width: "100%",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        marginTop: "1rem",
-    },
-    textField: {
-        width: "100%",
-        margin: "0.5rem 0",
-    },
-    button: {
-        margin: "0.5rem 0",
-    },
-}));
+import newTaskFormStyles from "../../styles/newTaskFormStyles";
 
 const NewTask = (props) => {
+    const classes = newTaskFormStyles();
     const accessToken = localStorage.getItem("accessToken");
     const { modalOpen, onClose } = props;
-    const classes = useStyles();
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [dueDate, setDueDate] = useState("");
@@ -129,13 +95,16 @@ const NewTask = (props) => {
                                     },
                                 }}
                             />
-                            <Button type="submit" className={classes.button}>
+                            <Button
+                                type="submit"
+                                className={classes.createButton}
+                            >
                                 Create
                             </Button>
                             <Button
                                 type="button"
                                 onClick={onClose}
-                                className={classes.button}
+                                className={classes.cancelButton}
                             >
                                 Cancel
                             </Button>

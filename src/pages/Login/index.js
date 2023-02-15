@@ -5,12 +5,14 @@ import {
     Typography,
     CircularProgress,
 } from "@material-ui/core";
-import "./styles.css";
 import { Link, useNavigate } from "react-router-dom";
 import authApi from "../../api/authApi";
 import MessageDialog from "../../components/MessageDialog";
+import authFormStyles from "../../styles/authFormStyles";
 
 const Login = () => {
+    const classes = authFormStyles();
+
     const [loading, setLoading] = useState(false);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -52,28 +54,30 @@ const Login = () => {
             {loading ? (
                 <CircularProgress />
             ) : (
-                <form onSubmit={handleSubmit} className="login-form">
-                    <Typography variant="h3">Task Management</Typography>
+                <form onSubmit={handleSubmit} className={classes.form}>
+                    <Typography variant="h3" className={classes.formTitle}>
+                        Task Management
+                    </Typography>
                     <TextField
                         label="Email"
                         type="email"
                         value={email}
                         onChange={(event) => setEmail(event.target.value)}
-                        className="login-input"
+                        className={classes.formInput}
                     />
                     <TextField
                         label="Password"
                         type="password"
                         value={password}
                         onChange={(event) => setPassword(event.target.value)}
-                        className="login-input"
+                        className={classes.formInput}
                     />
-                    <Button type="submit" className="login-button">
+                    <Button type="submit" className={classes.signInButton}>
                         Sign in
                     </Button>
-                    <Typography variant="body1" className="login-redirect">
+                    <Typography variant="body1" className={classes.redirect}>
                         Don't have an account?
-                        <Link to="/register" className="sign-up-button">
+                        <Link to="/register" className={classes.signUpButton}>
                             <Button variant="contained">Sign up</Button>
                         </Link>
                     </Typography>

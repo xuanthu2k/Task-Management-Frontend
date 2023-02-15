@@ -5,12 +5,14 @@ import {
     TextField,
     Typography,
 } from "@material-ui/core";
-import "./styles.css";
 import authApi from "../../api/authApi";
 import MessageDialog from "../../components/MessageDialog";
 import { useNavigate } from "react-router-dom";
+import authFormStyles from "../../styles/authFormStyles";
 
 const Register = () => {
+    const classes = authFormStyles();
+
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -52,6 +54,10 @@ const Register = () => {
         setOpenDialog(false);
     };
 
+    const handleBackToLogin = () => {
+        navigate("/login");
+    };
+
     return (
         <>
             <MessageDialog
@@ -62,37 +68,46 @@ const Register = () => {
             {loading ? (
                 <CircularProgress />
             ) : (
-                <form onSubmit={handleSubmit} className="register-form">
-                    <Typography variant="h4">Register</Typography>
+                <form onSubmit={handleSubmit} className={classes.form}>
+                    <Typography variant="h4" className={classes.formTitle}>
+                        Register
+                    </Typography>
                     <TextField
                         label="Username"
                         value={username}
                         onChange={(event) => setUsername(event.target.value)}
-                        className="register-input"
+                        className={classes.formInput}
                     />
                     <TextField
                         label="Email"
                         type="email"
                         value={email}
                         onChange={(event) => setEmail(event.target.value)}
-                        className="register-input"
+                        className={classes.formInput}
                     />
                     <TextField
                         label="Password"
                         type="password"
                         value={password}
                         onChange={(event) => setPassword(event.target.value)}
-                        className="register-input"
+                        className={classes.formInput}
                     />
                     <TextField
                         label="Phone"
                         type="phone"
                         value={phone}
                         onChange={(event) => setPhone(event.target.value)}
-                        className="register-input"
+                        className={classes.formInput}
                     />
-                    <Button type="submit" className="register-button">
-                        Submit
+                    <Button type="submit" className={classes.signUpButton}>
+                        Register
+                    </Button>
+                    <Button
+                        type="button"
+                        onClick={handleBackToLogin}
+                        className={classes.formButton}
+                    >
+                        Back to Login
                     </Button>
                 </form>
             )}

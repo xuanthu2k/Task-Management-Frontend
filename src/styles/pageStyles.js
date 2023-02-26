@@ -22,6 +22,7 @@ const pageStyles = makeStyles((theme) => ({
         backgroundColor: "yellow",
     },
     card: {
+        backgroundColor: "#f0f0f0",
         maxWidth: 345,
         margin: theme.spacing(2),
         cursor: "pointer",

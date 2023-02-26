@@ -1,10 +1,5 @@
 import React, { useState } from "react";
-import {
-    Button,
-    CircularProgress,
-    TextField,
-    Typography,
-} from "@material-ui/core";
+import { Button, CircularProgress, TextField, Typography } from "@material-ui/core";
 import authApi from "../../api/authApi";
 import MessageDialog from "../../components/MessageDialog";
 import { useNavigate } from "react-router-dom";
@@ -26,14 +21,30 @@ const Register = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
+            if (!username || username.length > 50) {
+                setMessage("Username invalid");
+                setOpenDialog(true);
+                return;
+            }
+            if (!email) {
+                setMessage("Email invalid");
+                setOpenDialog(true);
+                return;
+            }
+            if (!password || password.length > 50 || password.length < 6) {
+                setMessage("Password invalid");
+                setOpenDialog(true);
+                return;
+            }
+            if (!phone || phone.length > 15 || phone.length < 7 || isNaN(phone)) {
+                setMessage("Phone invalid");
+                setOpenDialog(true);
+                return;
+            }
             setLoading(true);
-            const response = await authApi.register(
-                username,
-                email,
-                password,
-                phone
-            );
+            const response = await authApi.register(username, email, password, phone);
             if (response && response.code === 200) {
+                alert("Register success!!!");
                 setLoading(false);
                 navigate("/login");
             } else {
@@ -60,11 +71,7 @@ const Register = () => {
 
     return (
         <>
-            <MessageDialog
-                open={openDialog}
-                onClose={handleCloseDialog}
-                message={message}
-            />
+            <MessageDialog open={openDialog} onClose={handleCloseDialog} message={message} />
             {loading ? (
                 <CircularProgress />
             ) : (

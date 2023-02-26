@@ -1,39 +1,51 @@
 import React, { useState, useEffect } from "react";
-import {
-    Grid,
-    Card,
-    CardContent,
-    Typography,
-    CircularProgress,
-    Button,
-} from "@material-ui/core";
+import { Grid, Card, CardContent, Typography, CircularProgress, Button } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import tasksApi from "../../api/tasksApi";
 import { useNavigate } from "react-router-dom";
 import NewTask from "../../components/NewTask";
 import userApi from "../../api/userApi";
 import pageStyles from "../../styles/pageStyles";
+import DetailTask from "../../components/DetailTask";
+import CardTask from "../../components/CardTask";
 
 const Dashboard = () => {
     const classes = pageStyles();
 
+    const [reRender, setReRender] = useState(false);
     const [tasks, setTasks] = useState([]);
+    // const [newTasks, setNewTasks] = useState([]);
+    // const [incompleteTasks, setIncompleteTasks] = useState([]);
+    // const [completeTasks, setCompleteTasks] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [newTaskModalOpen, setNewTaskModalOpen] = useState(false);
+    const [taskModalOpen, setTaskModalOpen] = useState(false);
+    const [taskDetailModalOpen, setTaskDetailModalOpen] = useState(false);
     const accessToken = localStorage.getItem("accessToken");
     const navigate = useNavigate();
 
     const handleNewTaskModalOpen = () => {
-        setNewTaskModalOpen(true);
+        setTaskModalOpen(true);
     };
 
     const handleNewTaskModalClose = () => {
-        setNewTaskModalOpen(false);
+        setTaskModalOpen(false);
+    };
+
+    const handleTaskDetailModalOpen = () => {
+        setTaskDetailModalOpen(true);
+    };
+
+    const handleTaskDetailModalClose = () => {
+        setTaskDetailModalOpen(false);
+    };
+
+    const handleReRender = () => {
+        setReRender(!reRender);
     };
 
     const handleLogout = () => {
         localStorage.clear();
-        window.location.reload();
+        navigate("/login");
     };
 
     useEffect(() => {
@@ -44,16 +56,19 @@ const Dashboard = () => {
             if (tasksData === 0 || userData === 0) {
                 navigate("/login");
             } else {
-                setTasks(tasksData.data);
-                console.log(userData);
+                // sort by DueDate
+                const tasksArray = tasksData.data;
+                tasksArray.sort((a, b) => new Date(a.DueDate) - new Date(b.DueDate));
+                setTasks(tasksArray);
                 setLoading(false);
             }
         };
         fetchData();
-    }, [newTaskModalOpen]);
+    }, [reRender]);
 
     const handleClickCard = (id) => {
-        navigate(`/task/${id}`);
+        setTaskDetailModalOpen(true);
+        localStorage.setItem("taskId", id);
     };
 
     const handleClickUserInfo = () => {
@@ -63,88 +78,81 @@ const Dashboard = () => {
     return (
         <div className={classes.root}>
             <div className={classes.header}>
-                <Button
-                    type="button"
-                    className={classes.button}
-                    onClick={handleClickUserInfo}
-                >
+                <Button type="button" className={classes.button} onClick={handleClickUserInfo}>
                     Info
                 </Button>
-                <Button
-                    type="button"
-                    className={classes.button}
-                    onClick={handleNewTaskModalOpen}
-                >
+                <Button type="button" className={classes.button} onClick={handleNewTaskModalOpen}>
                     New
                 </Button>
-                {newTaskModalOpen && (
+                {taskModalOpen && (
                     <NewTask
                         onClose={handleNewTaskModalClose}
-                        modalOpen={newTaskModalOpen}
+                        reRender={handleReRender}
+                        modalOpen={taskModalOpen}
                         tasks={tasks}
                         setTasks={setTasks}
                     />
                 )}
-                <Button
-                    type="button"
-                    onClick={handleLogout}
-                    className={classes.button}
-                >
+                {taskDetailModalOpen && (
+                    <DetailTask
+                        onClose={handleTaskDetailModalClose}
+                        reRender={handleReRender}
+                        modalOpen={handleTaskDetailModalOpen}
+                        tasks={tasks}
+                        setTasks={setTasks}
+                    />
+                )}
+                <Button type="button" onClick={handleLogout} className={classes.button}>
                     Logout
                 </Button>
             </div>
-            <Grid
-                container
-                direction="row"
-                justify="center"
-                alignItems="center"
-            >
+            <Grid container direction="row" justify="center" alignItems="center">
                 {loading ? (
                     <CircularProgress />
                 ) : (
-                    tasks.map((task) => (
-                        <Grid item key={task._id}>
-                            <Card
-                                className={classes.card}
-                                onClick={() => handleClickCard(task._id)}
-                            >
-                                <CardContent>
-                                    <Typography
-                                        variant="h5"
-                                        component="h2"
-                                        className={classes.title}
-                                    >
-                                        {task.Title}
-                                    </Typography>
-                                    <Typography
-                                        className={classes.description}
-                                        color="textSecondary"
-                                    >
-                                        {task.Description}
-                                    </Typography>
-                                    <Typography
-                                        variant="body2"
-                                        className={classes.status}
-                                    >
-                                        Status: {task.Status}
-                                    </Typography>
-                                    <Typography
-                                        variant="body2"
-                                        className={classes.dueDate}
-                                    >
-                                        Due Date:{" "}
-                                        {new Date(
-                                            task.DueDate
-                                        ).toLocaleDateString("en-GB", {
-                                            day: "2-digit",
-                                            month: "2-digit",
-                                            year: "numeric",
-                                        })}
-                                    </Typography>
-                                </CardContent>
-                            </Card>
+                    <Grid container spacing={4}>
+                        {/* Column for New tasks */}
+                        <Grid item xs={12} sm={4}>
+                            <Typography variant="h5">New Tasks</Typography>
+                            {tasks.filter((task) => task.Status === "New").length > 0 ? (
+                                tasks
+                                    .filter((task) => task.Status === "New")
+                                    .map((task) => (
+                                        <CardTask handleClickCard={handleClickCard} task={task} />
+                                    ))
+                            ) : (
+                                <Typography>No new tasks</Typography>
+                            )}
                         </Grid>
-                    ))
+
+                        {/* Column for Incomplete tasks */}
+                        <Grid item xs={12} sm={4}>
+                            <Typography variant="h5">Incomplete Tasks</Typography>
+                            {tasks.filter((task) => task.Status === "Incomplete").length > 0 ? (
+                                tasks
+                                    .filter((task) => task.Status === "Incomplete")
+                                    .map((task) => (
+                                        <CardTask handleClickCard={handleClickCard} task={task} />
+                                    ))
+                            ) : (
+                                <Typography>No incomplete tasks</Typography>
+                            )}
+                        </Grid>
+
+                        {/* Column for Complete tasks */}
+                        <Grid item xs={12} sm={4}>
+                            <Typography variant="h5">Complete Tasks</Typography>
+                            {tasks.filter((task) => task.Status === "Complete").length > 0 ? (
+                                tasks
+                                    .filter((task) => task.Status === "Complete")
+                                    .map((task) => (
+                                        <CardTask handleClickCard={handleClickCard} task={task} />
+                                    ))
+                            ) : (
+                                <Typography>No complete tasks</Typography>
+                            )}
+                        </Grid>
+                    </Grid>
                 )}
             </Grid>
         </div>

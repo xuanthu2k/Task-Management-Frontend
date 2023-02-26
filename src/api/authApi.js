@@ -9,13 +9,9 @@ authApi.login = async (email, password) => {
             email: email,
             password: password,
         });
-        if (response.data) {
-            return response.data;
-        }
         return response;
     } catch (error) {
-        console.error(error);
-        return 0;
+        return error;
     }
 };
 

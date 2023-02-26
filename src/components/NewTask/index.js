@@ -12,7 +12,7 @@ import newTaskFormStyles from "../../styles/newTaskFormStyles";
 const NewTask = (props) => {
     const classes = newTaskFormStyles();
     const accessToken = localStorage.getItem("accessToken");
-    const { modalOpen, onClose } = props;
+    const { modalOpen, onClose, reRender } = props;
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [dueDate, setDueDate] = useState("");
@@ -22,19 +22,51 @@ const NewTask = (props) => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        setLoading(true);
-        const postData = await tasksApi.createTask({
-            accessToken,
-            title,
-            description,
-            dueDate,
-        });
-        if (postData === 0) {
-            setMessage("Create Task Failure!!!");
-            setOpenDialog(true);
-            setLoading(false);
-        } else {
-            setMessage("Create Task Success!!!");
+        try {
+            if (!title) {
+                setMessage("Title invalid!");
+                setOpenDialog(true);
+                return;
+            }
+            if (!description) {
+                setMessage("Description invalid!");
+                setOpenDialog(true);
+                return;
+            }
+            if (!dueDate) {
+                setMessage("dueDate invalid!");
+                setOpenDialog(true);
+                return;
+            }
+            if (dueDate) {
+                const today = new Date();
+                const dueDateConverted = new Date(dueDate);
+                if (today > dueDateConverted) {
+                    setMessage("dueDate must not be less than today!");
+                    setOpenDialog(true);
+                    return;
+                }
+            }
+
+            setLoading(true);
+            const postData = await tasksApi.createTask({
+                accessToken,
+                title,
+                description,
+                dueDate,
+            });
+            if (postData === 0) {
+                setMessage("Create Task Failure!!!");
+                setOpenDialog(true);
+                setLoading(false);
+            } else {
+                reRender();
+                alert("Create task success!");
+                onClose();
+                setLoading(false);
+            }
+        } catch (error) {
+            setMessage("Has error!!!");
             setOpenDialog(true);
             setLoading(false);
         }
@@ -46,12 +78,8 @@ const NewTask = (props) => {
 
     return (
         <>
-            <MessageDialog
-                open={openDialog}
-                onClose={handleCloseDialog}
-                message={message}
-            />
-            <Modal open={modalOpen} onClose={onClose} className={classes.modal}>
+            <MessageDialog open={openDialog} onClose={handleCloseDialog} message={message} />
+            <Modal open={modalOpen} className={classes.modal}>
                 <div className={classes.paper}>
                     <Typography variant="h3" className={classes.title}>
                         New Task
@@ -65,9 +93,7 @@ const NewTask = (props) => {
                                 label="Title"
                                 type="text"
                                 value={title}
-                                onChange={(event) =>
-                                    setTitle(event.target.value)
-                                }
+                                onChange={(event) => setTitle(event.target.value)}
                                 className={classes.textField}
                             />
                             <TextField
@@ -75,9 +101,7 @@ const NewTask = (props) => {
                                 label="Description"
                                 type="text"
                                 value={description}
-                                onChange={(event) =>
-                                    setDescription(event.target.value)
-                                }
+                                onChange={(event) => setDescription(event.target.value)}
                                 className={classes.textField}
                             />
                             <TextField
@@ -85,9 +109,7 @@ const NewTask = (props) => {
                                 label="Due Date"
                                 type="date"
                                 value={dueDate}
-                                onChange={(event) =>
-                                    setDueDate(event.target.value)
-                                }
+                                onChange={(event) => setDueDate(event.target.value)}
                                 className={classes.textField}
                                 InputProps={{
                                     style: {
@@ -95,10 +117,7 @@ const NewTask = (props) => {
                                     },
                                 }}
                             />
-                            <Button
-                                type="submit"
-                                className={classes.createButton}
-                            >
+                            <Button type="submit" className={classes.createButton}>
                                 Create
                             </Button>
                             <Button

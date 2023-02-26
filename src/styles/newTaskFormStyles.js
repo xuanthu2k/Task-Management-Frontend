@@ -17,7 +17,7 @@ const newTaskFormStyles = makeStyles((theme) => ({
         alignItems: "center",
     },
     title: {
-        margin: "1rem 0",
+        margin: "1rem 1rem",
     },
     form: {
         width: "100%",
@@ -42,10 +42,44 @@ const newTaskFormStyles = makeStyles((theme) => ({
     cancelButton: {
         margin: theme.spacing(1),
         width: "50%",
-        backgroundColor: "#d13d1f",
+        backgroundColor: "#df994f",
         color: "white",
         "&:hover": {
             backgroundColor: "#c7581f",
+        },
+    },
+    deleteButton: {
+        margin: theme.spacing(1),
+        width: "50%",
+        backgroundColor: "#d13d1f",
+        color: "white",
+        "&:hover": {
+            backgroundColor: "#c73315",
+        },
+    },
+    textContainer: {
+        display: "flex",
+        alignItems: "center",
+        flexDirection: "row",
+    },
+    buttonContainer: {
+        display: "flex",
+        alignItems: "center",
+        flexDirection: "row",
+        width: "100%",
+    },
+    textarea: {
+        width: "95%",
+        maxHeight: "200px",
+        maxWidth: "95%",
+        border: `1px solid ${theme.palette.grey[500]}`,
+        borderRadius: theme.shape.borderRadius,
+        padding: theme.spacing(2),
+        fontSize: theme.typography.fontSize,
+        fontFamily: theme.typography.fontFamily,
+        "&:focus": {
+            outline: "none",
+            borderColor: theme.palette.primary.main,
         },
     },
 }));

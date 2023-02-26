@@ -1,10 +1,5 @@
 import React, { useState } from "react";
-import {
-    Button,
-    TextField,
-    Typography,
-    CircularProgress,
-} from "@material-ui/core";
+import { Button, TextField, Typography, CircularProgress } from "@material-ui/core";
 import { Link, useNavigate } from "react-router-dom";
 import authApi from "../../api/authApi";
 import MessageDialog from "../../components/MessageDialog";
@@ -17,40 +12,50 @@ const Login = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [openDialog, setOpenDialog] = useState(false);
+    const [msg, setMsg] = useState("");
     const navigate = useNavigate();
 
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
+            if (!email || !password) {
+                setMsg("email/password is empty!!!");
+                setOpenDialog(true);
+                return;
+            }
+            if (password.length < 6) {
+                setMsg("invalid password");
+                setOpenDialog(true);
+                return;
+            }
+
             setLoading(true);
             const response = await authApi.login(email, password);
-            if (response && response.code === 200) {
-                localStorage.setItem("accessToken", response.accessToken);
-                console.log(response.message);
+            if (response.data && response.data.code === 200) {
+                localStorage.setItem("accessToken", response.data.accessToken);
                 setLoading(false);
                 navigate("/dashboard");
             } else {
+                setMsg(response.response.data.message);
                 setOpenDialog(true);
-                console.log("failure");
+                setLoading(false);
+                navigate("/login");
             }
         } catch (error) {
+            setMsg("has error!!!");
             setOpenDialog(true);
-            console.log(error);
-            console.log("failure");
+            setLoading(false);
+            navigate("/login");
         }
     };
 
     const handleCloseDialog = () => {
-        window.location.reload();
+        setOpenDialog(false);
     };
 
     return (
         <>
-            <MessageDialog
-                open={openDialog}
-                onClose={handleCloseDialog}
-                message={"Login Failure"}
-            />
+            <MessageDialog open={openDialog} onClose={handleCloseDialog} message={msg} />
             {loading ? (
                 <CircularProgress />
             ) : (

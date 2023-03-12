@@ -32,4 +32,4 @@ function CardTask(props) {
     );
 }
 
-export default CardTask;
+export default React.memo(CardTask);

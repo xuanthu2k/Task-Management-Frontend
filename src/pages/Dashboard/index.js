@@ -113,7 +113,9 @@ const Dashboard = () => {
                     <Grid container spacing={4}>
                         {/* Column for New tasks */}
                         <Grid item xs={12} sm={4}>
-                            <Typography variant="h5">New Tasks</Typography>
+                            <Typography variant="h5" style={{ color: "red" }}>
+                                New Tasks
+                            </Typography>
                             {tasks.filter((task) => task.Status === "New").length > 0 ? (
                                 tasks
                                     .filter((task) => task.Status === "New")
@@ -127,7 +129,9 @@ const Dashboard = () => {
 
                         {/* Column for Incomplete tasks */}
                         <Grid item xs={12} sm={4}>
-                            <Typography variant="h5">Incomplete Tasks</Typography>
+                            <Typography variant="h5" style={{ color: "red" }}>
+                                Incomplete Tasks
+                            </Typography>
                             {tasks.filter((task) => task.Status === "Incomplete").length > 0 ? (
                                 tasks
                                     .filter((task) => task.Status === "Incomplete")
@@ -141,7 +145,9 @@ const Dashboard = () => {
 
                         {/* Column for Complete tasks */}
                         <Grid item xs={12} sm={4}>
-                            <Typography variant="h5">Complete Tasks</Typography>
+                            <Typography variant="h5" style={{ color: "red" }}>
+                                Complete Tasks
+                            </Typography>
                             {tasks.filter((task) => task.Status === "Complete").length > 0 ? (
                                 tasks
                                     .filter((task) => task.Status === "Complete")
@@ -159,4 +165,4 @@ const Dashboard = () => {
     );
 };
 
-export default Dashboard;
+export default React.memo(Dashboard);
